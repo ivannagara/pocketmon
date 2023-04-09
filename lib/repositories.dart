@@ -14,6 +14,6 @@ class HTTPRepository implements Repository {
   HomeRepository get getHomeRepository => HomeHTTPRepository();
 
   @override
-  PokemonRepository get getPokemonRepository =>
-      PokemonHTTPRepository(hostUrl: hostUrl, path: '');
+  PokemonRepository get getPokemonRepository => PokemonHTTPRepository(
+      hostUrl: hostUrl, path: 'pokemon?limit=20&offset=0');
 }

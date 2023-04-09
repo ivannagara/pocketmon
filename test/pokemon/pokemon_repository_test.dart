@@ -58,7 +58,7 @@ void main() {
         verify(() => mockClient.get(Uri.parse('/123/123/aaa'))).called(1);
       });
       test(
-          'when HTTP calll returns a response code other than 200, should '
+          'when HTTP call returns a response code other than 200, should '
           'throw error', () async {
         when(() => mockClient.get(any())).thenAnswer(
           (_) async => http.Response(
@@ -77,12 +77,92 @@ void main() {
           return [];
         });
       });
+      test('when the response is an empty string, should throw exception',
+          () async {
+        const jsonFile = '';
+        when(() => mockClient.get(any())).thenAnswer(
+          (_) async => http.Response(
+            jsonFile,
+            200,
+          ),
+        );
+        final res = PokemonHTTPRepository(
+          client: mockClient,
+          path: '',
+          hostUrl: '',
+        ).getPokemons();
+        res.onError((error, stackTrace) async {
+          expect(error, isA<Exception>());
+          expect(error.toString(), contains('JSON body is empty'));
+          return [];
+        });
+      });
+      test(
+          'when HTTP call returns a response result of empty map, should '
+          'throw error', () async {
+        const jsonFile = '''
+{
+  "count": 1279,
+  "next": "https://pokeapi.co/api/v2/pokemon?offset=3&limit=3",
+  "previous": null
+}''';
+        when(() => mockClient.get(any())).thenAnswer(
+          (_) async => http.Response(
+            jsonFile,
+            200,
+          ),
+        );
+        final res = PokemonHTTPRepository(
+          client: mockClient,
+          path: '',
+          hostUrl: '',
+        ).getPokemons();
+        res.onError((error, stackTrace) async {
+          expect(error, isA<Exception>());
+          expect(error.toString(), contains('Results body not found'));
+          return [];
+        });
+      });
       test(
           'when HTTP calll returns a response code of 200, should '
           'return a list of pokemon preview', () async {
+        const jsonFile = '''
+{
+  "count": 1279,
+  "next": "https://pokeapi.co/api/v2/pokemon?offset=3&limit=3",
+  "previous": null,
+  "results": [
+    {
+      "name": "bulbasaur",
+      "url": "https://pokeapi.co/api/v2/pokemon/1/"
+    },
+    {
+      "name": "ivysaur",
+      "url": "https://pokeapi.co/api/v2/pokemon/2/"
+    },
+    {
+      "name": "venusaur",
+      "url": "https://pokeapi.co/api/v2/pokemon/3/"
+    }
+  ]
+}''';
+        const expectedAnswer = [
+          PokemonPreview(
+            name: 'bulbasaur',
+            url: 'https://pokeapi.co/api/v2/pokemon/1/',
+          ),
+          PokemonPreview(
+            name: 'ivysaur',
+            url: 'https://pokeapi.co/api/v2/pokemon/2/',
+          ),
+          PokemonPreview(
+            name: 'venusaur',
+            url: 'https://pokeapi.co/api/v2/pokemon/3/',
+          ),
+        ];
         when(() => mockClient.get(any())).thenAnswer(
           (_) async => http.Response(
-            'success',
+            jsonFile,
             200,
           ),
         );
@@ -91,7 +171,7 @@ void main() {
           hostUrl: '',
           path: '',
         ).getPokemons();
-        expect(res, isA<List<PokemonPreview>>());
+        expect(res, expectedAnswer);
       });
     });
   });
