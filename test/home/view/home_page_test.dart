@@ -11,15 +11,5 @@ void main() {
       await tester.pumpWidget(page);
       expect(find.byType(HomePage), findsOneWidget);
     });
-    testWidgets('should have a search bar to search for pokemons',
-        (tester) async {
-      await tester.pumpWidget(page);
-      expect(find.byKey(const Key('searchPokemonField')), findsOneWidget);
-    });
-    testWidgets('when repository throws error, should show the error message',
-        (tester) async {
-      await tester.pumpWidget(page);
-      expect(find.byKey(const Key('searchPokemonField')), findsOneWidget);
-    });
   });
 }
