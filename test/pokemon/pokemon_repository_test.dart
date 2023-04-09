@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:pokedex_app/pokemon/models/pokemon.dart';
+import 'package:pokedex_app/pokemon/models/pokemon_preview.dart';
 import 'package:pokedex_app/pokemon/pokemon_repository.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,6 +12,12 @@ void main() {
     setUp(() {
       registerFallbackValue(Uri());
       mockClient = MockClient();
+      when(() => mockClient.get(any())).thenAnswer(
+        (_) async => http.Response(
+          'success',
+          200,
+        ),
+      );
     });
     tearDown(() {
       reset(mockClient);
@@ -21,13 +27,15 @@ void main() {
       expect(repo, isA<PokemonHTTPRepository>());
     });
     test('should be initializable when injected by client', () async {
-      final repo = PokemonHTTPRepository(client: http.Client(), url: '');
+      final repo = PokemonHTTPRepository(client: mockClient, url: '');
       expect(repo, isA<PokemonHTTPRepository>());
     });
     group('getPokemons', () {
-      test('should have a getPokemons that returns list of pokemons', () async {
-        final res = await PokemonHTTPRepository(url: '').getPokemons();
-        expect(res, isA<List<Pokemon>>());
+      test('should have a getPokemons that returns list of pokemon previews',
+          () async {
+        final res = await PokemonHTTPRepository(url: '', client: mockClient)
+            .getPokemons();
+        expect(res, isA<List<PokemonPreview>>());
       });
       test(
           'when injected with url, should verify that the url is called within '
@@ -65,7 +73,7 @@ void main() {
       });
       test(
           'when HTTP calll returns a response code of 200, should '
-          'return a list of pokemon', () async {
+          'return a list of pokemon preview', () async {
         when(() => mockClient.get(any())).thenAnswer(
           (_) async => http.Response(
             'success',
@@ -76,7 +84,7 @@ void main() {
           client: mockClient,
           url: '',
         ).getPokemons();
-        expect(res, isA<List<Pokemon>>());
+        expect(res, isA<List<PokemonPreview>>());
       });
     });
   });

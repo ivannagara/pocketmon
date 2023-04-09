@@ -1,8 +1,9 @@
-import 'models/pokemon.dart';
+import 'package:pokedex_app/pokemon/models/pokemon_preview.dart';
+
 import 'package:http/http.dart' as http;
 
 abstract class PokemonRepository {
-  Future<List<Pokemon>> getPokemons();
+  Future<List<PokemonPreview>> getPokemons();
 }
 
 class PokemonHTTPRepository implements PokemonRepository {
@@ -15,7 +16,7 @@ class PokemonHTTPRepository implements PokemonRepository {
   final String url;
 
   @override
-  Future<List<Pokemon>> getPokemons() async {
+  Future<List<PokemonPreview>> getPokemons() async {
     final res = await _client.get(Uri.parse(url));
     if (res.statusCode != 200) {
       throw Exception('${res.statusCode}: ${res.body}');
