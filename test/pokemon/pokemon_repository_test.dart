@@ -23,18 +23,22 @@ void main() {
       reset(mockClient);
     });
     test('should be initializable', () {
-      final repo = PokemonHTTPRepository(url: '123');
+      final repo = PokemonHTTPRepository(hostUrl: '123', path: '');
       expect(repo, isA<PokemonHTTPRepository>());
     });
     test('should be initializable when injected by client', () async {
-      final repo = PokemonHTTPRepository(client: mockClient, url: '');
+      final repo =
+          PokemonHTTPRepository(client: mockClient, hostUrl: '', path: '');
       expect(repo, isA<PokemonHTTPRepository>());
     });
     group('getPokemons', () {
       test('should have a getPokemons that returns list of pokemon previews',
           () async {
-        final res = await PokemonHTTPRepository(url: '', client: mockClient)
-            .getPokemons();
+        final res = await PokemonHTTPRepository(
+          hostUrl: '',
+          path: '',
+          client: mockClient,
+        ).getPokemons();
         expect(res, isA<List<PokemonPreview>>());
       });
       test(
@@ -48,9 +52,10 @@ void main() {
         );
         await PokemonHTTPRepository(
           client: mockClient,
-          url: '/123/123',
+          hostUrl: '/123/123/',
+          path: 'aaa',
         ).getPokemons();
-        verify(() => mockClient.get(Uri.parse('/123/123'))).called(1);
+        verify(() => mockClient.get(Uri.parse('/123/123/aaa'))).called(1);
       });
       test(
           'when HTTP calll returns a response code other than 200, should '
@@ -63,7 +68,8 @@ void main() {
         );
         final res = PokemonHTTPRepository(
           client: mockClient,
-          url: '',
+          path: '',
+          hostUrl: '',
         ).getPokemons();
         res.onError((error, stackTrace) async {
           expect(error, isA<Exception>());
@@ -82,7 +88,8 @@ void main() {
         );
         final res = await PokemonHTTPRepository(
           client: mockClient,
-          url: '',
+          hostUrl: '',
+          path: '',
         ).getPokemons();
         expect(res, isA<List<PokemonPreview>>());
       });
