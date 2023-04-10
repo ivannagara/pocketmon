@@ -8,57 +8,58 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Pokedex App')),
-        body: RepositoryProvider<HomeRepository>(
-          create: (context) => HomeHTTPRepository(),
-          child: Column(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PokemonsPage(),
-                    ),
-                  );
-                },
-                child: const Text('Load Pokemons'),
-              ),
-              Expanded(
-                child: ListView.builder(
-                    itemCount: 5,
-                    itemBuilder: (context, index) => ListTile(
-                          title: Text(index.toString()),
-                        )),
-              ),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pokedex App')),
+      body: RepositoryProvider<HomeRepository>(
+        create: (context) => HomeHTTPRepository(),
+        child: Column(
+          children: const [
+            _PokeballLogo(),
+            _NavigateToPokemonsPageButton(),
+          ],
         ),
       ),
     );
   }
 }
 
-class _SearchPokemonTextField extends StatelessWidget {
-  const _SearchPokemonTextField({
+class _PokeballLogo extends StatelessWidget {
+  const _PokeballLogo({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      key: const Key('searchPokemonField'),
-      decoration: InputDecoration(
-          hintText: 'e.g. Pikachu, Charmander',
-          label: Row(
-            children: const [
-              Icon(Icons.search),
-              SizedBox(width: 4),
-              Text('Search Pokemons'),
-            ],
-          )),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Center(
+        child: SizedBox(
+          height: 120,
+          width: 120,
+          child: Image.asset('assets/pokeball.jpeg'),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavigateToPokemonsPageButton extends StatelessWidget {
+  const _NavigateToPokemonsPageButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const PokemonsPage(),
+          ),
+        );
+      },
+      child: const Text("Let's Get Started!"),
     );
   }
 }

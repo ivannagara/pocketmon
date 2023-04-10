@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:pokedex_app/pokemon/models/pokemon_preview.dart';
+import 'package:pokedex_app/pokemon/pokemon.dart';
 import 'package:pokedex_app/pokemon/pokemon_repository.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,26 +9,33 @@ class MockClient extends Mock implements http.Client {}
 void main() {
   group('PokemonHTTPRepository', () {
     late MockClient mockClient;
-    const jsonFile = '''
-{
-  "count": 1279,
-  "next": "https://pokeapi.co/api/v2/pokemon?offset=3&limit=3",
-  "previous": null,
-  "results": [
-    {
-      "name": "bulbasaur",
-      "url": "https://pokeapi.co/api/v2/pokemon/1/"
-    },
-    {
-      "name": "ivysaur",
-      "url": "https://pokeapi.co/api/v2/pokemon/2/"
-    },
-    {
-      "name": "venusaur",
-      "url": "https://pokeapi.co/api/v2/pokemon/3/"
-    }
-  ]
-}''';
+    const jsonFile = '''{
+      "pokemon": [
+        {
+          "id": 1,
+          "num": "001",
+          "name": "Bulbasaur",
+          "img": "http://www.serebii.net/pokemongo/pokemon/001.png",
+          "type": ["Grass", "Poison"],
+          "height": "0.71 m",
+          "weight": "6.9 kg",
+          "candy": "Bulbasaur Candy",
+          "candy_count": 25,
+          "egg": "2 km",
+          "spawn_chance": 0.69,
+          "avg_spawns": 69,
+          "spawn_time": "20:00",
+          "multipliers": [1.58],
+          "weaknesses": ["Fire", "Ice", "Flying", "Psychic"],
+          "next_evolution": [
+            {
+              "num": "002",
+              "name": "Ivysaur"
+              }
+          ]
+        }
+      ]
+    }''';
     setUp(() {
       registerFallbackValue(Uri());
       mockClient = MockClient();
@@ -122,9 +129,7 @@ void main() {
           'throw error', () async {
         const jsonFile = '''
 {
-  "count": 1279,
-  "next": "https://pokeapi.co/api/v2/pokemon?offset=3&limit=3",
-  "previous": null
+  "count": null
 }''';
         when(() => mockClient.get(any())).thenAnswer(
           (_) async => http.Response(
@@ -139,7 +144,7 @@ void main() {
         ).getPokemons();
         res.onError((error, stackTrace) async {
           expect(error, isA<Exception>());
-          expect(error.toString(), contains('Results body not found'));
+          expect(error.toString(), contains('Pokemons body not found'));
           return [];
         });
       });
@@ -148,16 +153,24 @@ void main() {
           'return a list of pokemon preview', () async {
         const expectedAnswer = [
           PokemonPreview(
-            name: 'bulbasaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/1/',
-          ),
-          PokemonPreview(
-            name: 'ivysaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/2/',
-          ),
-          PokemonPreview(
-            name: 'venusaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/3/',
+            id: 1,
+            num: '001',
+            name: 'Bulbasaur',
+            img: 'http://www.serebii.net/pokemongo/pokemon/001.png',
+            type: ['Grass', 'Poison'],
+            height: '0.71 m',
+            weight: '6.9 kg',
+            candy: 'Bulbasaur Candy',
+            candyCount: 25,
+            egg: '2 km',
+            spawnChance: 0.69,
+            avgSpawns: 69,
+            spawnTime: '20:00',
+            multipliers: [1.58],
+            weaknesses: ['Fire', 'Ice', 'Flying', 'Psychic'],
+            nextEvolution: [
+              NextEvolution(name: 'Ivysaur', num: '002'),
+            ],
           ),
         ];
         when(() => mockClient.get(any())).thenAnswer(

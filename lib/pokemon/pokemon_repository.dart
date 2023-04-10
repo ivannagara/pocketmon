@@ -32,9 +32,9 @@ class PokemonHTTPRepository implements PokemonRepository {
     }
 
     final decodedJson = json.decode(res.body) as Map<String, dynamic>?;
-    final results = decodedJson?['results'] as List<dynamic>?;
+    final results = decodedJson?['pokemon'] as List<dynamic>?;
 
-    if (results == null) throw Exception('Results body not found');
+    if (results == null) throw Exception('Pokemons body not found');
 
     final pokemonPreviewList =
         results.map((e) => PokemonPreview.fromJson(e ?? {})).toList();
