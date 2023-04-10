@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pokedex_app/loading_indicator/loading_indicator.dart';
-import 'package:pokedex_app/pokemon/models/pokemon_preview.dart';
+import 'package:pokedex_app/pokemon/pokemon.dart';
 import 'package:pokedex_app/pokemon/pokemon_repository.dart';
 import 'package:pokedex_app/repositories.dart';
 
@@ -16,7 +16,7 @@ class PokemonsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider<PokemonRepository>(
       create: (context) => HTTPRepository().getPokemonRepository,
-      child: const PokemonsPageScaffold(childCount: 15),
+      child: const PokemonsPageScaffold(childCount: 30),
     );
   }
 }
@@ -43,14 +43,8 @@ class PokemonsPageScaffold extends StatelessWidget {
           }
           if (snapshot.hasData) {
             return NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                SliverAppBar(
-                  leading: const _AppBarBackButton(),
-                  expandedHeight: MediaQuery.of(context).size.height * 0.3,
-                  backgroundColor: Colors.transparent,
-                  flexibleSpace: const _DiscoverPokemonFlexibleAppBar(),
-                )
-              ],
+              headerSliverBuilder: (context, innerBoxIsScrolled) =>
+                  [const _FlexibleAppBar()],
               body: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -58,18 +52,9 @@ class PokemonsPageScaffold extends StatelessWidget {
                     Stack(
                       children: [
                         const _PokeballBackgroundImage(),
-                        GridView.builder(
-                          itemCount: childCount ?? snapshot.data?.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                          ),
-                          itemBuilder: (context, index) => _PokemonsGridTile(
-                            index: index,
-                            imageUrl: snapshot.data?[index].img ?? '',
-                          ),
+                        _PokemonGridViewLists(
+                          childCount: childCount,
+                          pokemons: snapshot.data ?? [],
                         ),
                       ],
                     ),
@@ -81,6 +66,68 @@ class PokemonsPageScaffold extends StatelessWidget {
           return const PokeballLoadingIndicator();
         },
       ),
+    );
+  }
+}
+
+class _PokeballBackgroundImage extends StatelessWidget {
+  const _PokeballBackgroundImage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: -50,
+      right: -50,
+      child: Image.asset(
+        'assets/pokeball2.png',
+        width: 200,
+        fit: BoxFit.fitWidth,
+      ),
+    );
+  }
+}
+
+class _PokemonGridViewLists extends StatelessWidget {
+  const _PokemonGridViewLists({
+    Key? key,
+    required this.childCount,
+    required this.pokemons,
+  }) : super(key: key);
+
+  final int? childCount;
+  final List<PokemonPreview> pokemons;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      itemCount: childCount ?? pokemons.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.25,
+      ),
+      itemBuilder: (context, index) => _PokemonsGridTile(
+        pokemon: pokemons[index],
+      ),
+    );
+  }
+}
+
+class _FlexibleAppBar extends StatelessWidget {
+  const _FlexibleAppBar({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      leading: const _AppBarBackButton(),
+      expandedHeight: MediaQuery.of(context).size.height * 0.3,
+      backgroundColor: Colors.transparent,
+      flexibleSpace: const _DiscoverPokemonFlexibleAppBar(),
     );
   }
 }
@@ -107,34 +154,13 @@ class _AppBarBackButton extends StatelessWidget {
   }
 }
 
-class _PokeballBackgroundImage extends StatelessWidget {
-  const _PokeballBackgroundImage({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: -50,
-      right: -50,
-      child: Image.asset(
-        'assets/pokeball2.png',
-        width: 200,
-        fit: BoxFit.fitWidth,
-      ),
-    );
-  }
-}
-
 class _PokemonsGridTile extends StatelessWidget {
   const _PokemonsGridTile({
     Key? key,
-    this.index = 0,
-    this.imageUrl = '',
+    required this.pokemon,
   }) : super(key: key);
 
-  final int index;
-  final String imageUrl;
+  final PokemonPreview pokemon;
 
   @override
   Widget build(BuildContext context) {
@@ -142,28 +168,130 @@ class _PokemonsGridTile extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: ColoredBox(
-          color: Colors.white,
-          child: GridTile(
-            child: Stack(
-              children: [
-                Center(
-                  child: Text(
-                    '${index + 1}',
-                    style: Theme.of(context).textTheme.headline2!.copyWith(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                        ),
-                    textScaleFactor: 1.6,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PokemonDetailsPage(pokemon: pokemon),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.blueGrey.shade600.withAlpha(180),
+                  getGridTileColor(pokemon.type[0]).withAlpha(220),
+                ],
+              ),
+            ),
+            child: GridTile(
+              child: Stack(
+                children: [
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: _TypeColoredCircleBackground(
+                      type: pokemon.type[0],
+                    ),
                   ),
-                ),
-                Center(
-                  child: _PokemonGridTileImage(imageUrl: imageUrl),
-                ),
-              ],
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: _PokemonGridTileImage(imageUrl: pokemon.img),
+                  ),
+                  Positioned(
+                    top: 2,
+                    left: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: _PokemonNameAndTypeChipsColumn(
+                        pokemon: pokemon,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PokemonNameAndTypeChipsColumn extends StatelessWidget {
+  const _PokemonNameAndTypeChipsColumn({
+    Key? key,
+    required this.pokemon,
+  }) : super(key: key);
+
+  final PokemonPreview pokemon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _PokemonNameText(name: pokemon.name),
+          ...getTypeChip(pokemon.type),
+        ],
+      ),
+    );
+  }
+}
+
+class _PokemonNameText extends StatelessWidget {
+  const _PokemonNameText({
+    Key? key,
+    required this.name,
+  }) : super(key: key);
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.25,
+      child: FittedBox(
+        alignment: Alignment.centerLeft,
+        fit: BoxFit.scaleDown,
+        child: Text(
+          name,
+          style: Theme.of(context).textTheme.headline6!.copyWith(
+                color: Colors.white.withAlpha(220),
+                fontWeight: FontWeight.bold,
+              ),
+          textAlign: TextAlign.start,
+          textScaleFactor: 1,
+        ),
+      ),
+    );
+  }
+}
+
+class _TypeColoredCircleBackground extends StatelessWidget {
+  const _TypeColoredCircleBackground({
+    Key? key,
+    required this.type,
+  }) : super(key: key);
+
+  final String type;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(75),
+      child: Container(
+        height: 120,
+        width: 120,
+        color: getPokemonBackgroundColor(type).withAlpha(80),
       ),
     );
   }
@@ -271,13 +399,16 @@ class _DiscoverPokemonFlexibleAppBarState
           ),
         ),
         child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 1000),
           switchInCurve: Curves.easeInOut,
           switchOutCurve: Curves.easeInOut,
-          child: Image.asset(
-            _backgroundImages[_backgroundImageIndex],
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.45,
             key: ValueKey<int>(_backgroundImageIndex),
-            fit: BoxFit.cover,
+            child: Image.asset(
+              _backgroundImages[_backgroundImageIndex],
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
