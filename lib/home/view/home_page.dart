@@ -41,24 +41,24 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _SearchPokemonTextField extends StatelessWidget {
-  const _SearchPokemonTextField({
-    Key? key,
-  }) : super(key: key);
+// class _SearchPokemonTextField extends StatelessWidget {
+//   const _SearchPokemonTextField({
+//     Key? key,
+//   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      key: const Key('searchPokemonField'),
-      decoration: InputDecoration(
-          hintText: 'e.g. Pikachu, Charmander',
-          label: Row(
-            children: const [
-              Icon(Icons.search),
-              SizedBox(width: 4),
-              Text('Search Pokemons'),
-            ],
-          )),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextFormField(
+//       key: const Key('searchPokemonField'),
+//       decoration: InputDecoration(
+//           hintText: 'e.g. Pikachu, Charmander',
+//           label: Row(
+//             children: const [
+//               Icon(Icons.search),
+//               SizedBox(width: 4),
+//               Text('Search Pokemons'),
+//             ],
+//           )),
+//     );
+//   }
+// }

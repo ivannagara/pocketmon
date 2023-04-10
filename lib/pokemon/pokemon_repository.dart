@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 abstract class PokemonRepository {
   Future<List<PokemonPreview>> getPokemons();
+  Future<List<dynamic>> getPokemonsFromGithubRepo();
 }
 
 class PokemonHTTPRepository implements PokemonRepository {
@@ -40,5 +41,10 @@ class PokemonHTTPRepository implements PokemonRepository {
         results.map((e) => PokemonPreview.fromJson(e ?? {})).toList();
 
     return pokemonPreviewList;
+  }
+
+  @override
+  Future<List> getPokemonsFromGithubRepo() async {
+    return [];
   }
 }
