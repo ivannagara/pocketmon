@@ -16,7 +16,7 @@ class PokemonsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider<PokemonRepository>(
       create: (context) => HTTPRepository().getPokemonRepository,
-      child: const PokemonsPageScaffold(),
+      child: const PokemonsPageScaffold(childCount: 15),
     );
   }
 }
@@ -24,14 +24,17 @@ class PokemonsPage extends StatelessWidget {
 class PokemonsPageScaffold extends StatelessWidget {
   const PokemonsPageScaffold({
     Key? key,
+    this.childCount,
   }) : super(key: key);
+
+  final int? childCount;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blueGrey.shade300,
       body: FutureBuilder<List<PokemonPreview>>(
-        future: context.read<PokemonRepository>().getPokemonsFromGithubRepo(),
+        future: context.read<PokemonRepository>().getPokemons(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -55,19 +58,17 @@ class PokemonsPageScaffold extends StatelessWidget {
                     Stack(
                       children: [
                         const _PokeballBackgroundImage(),
-                        Expanded(
-                          child: GridView.builder(
-                            itemCount: 15,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                            ),
-                            itemBuilder: (context, index) => _PokemonsGridTile(
-                              index: index,
-                              imageUrl: snapshot.data?[index].img ?? '',
-                            ),
+                        GridView.builder(
+                          itemCount: childCount ?? snapshot.data?.length,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                          ),
+                          itemBuilder: (context, index) => _PokemonsGridTile(
+                            index: index,
+                            imageUrl: snapshot.data?[index].img ?? '',
                           ),
                         ),
                       ],

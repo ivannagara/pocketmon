@@ -28,7 +28,7 @@ class PokemonPreview extends Equatable {
     final num = json['num'] as String?;
     final id = json['id'] as int?;
     final img = json['img'] as String?;
-    final type = json['type'].cast<String>();
+    final type = json['type'] as List<dynamic>?;
     final height = json['height'] as String?;
     final weight = json['weight'] as String?;
     final candy = json['candy'] as String?;
@@ -40,6 +40,9 @@ class PokemonPreview extends Equatable {
     final multipliers = json['multipliers'] as List<dynamic>?;
     final weaknesses = json['weaknesses'] as List<dynamic>?;
     final nextEvolution = json['next_evolution'] as List<dynamic>?;
+
+    final castedType =
+        type != null ? type.map((e) => e as String).toList() : <String>[];
 
     final castedSpawnChance = double.tryParse(
       spawnChance.isNotEmpty ? spawnChance : '0',
@@ -70,7 +73,7 @@ class PokemonPreview extends Equatable {
       name: name ?? '',
       num: num ?? '',
       img: img ?? '',
-      type: type ?? <String>[],
+      type: castedType,
       height: height ?? '',
       weight: weight ?? '',
       candy: candy ?? '',

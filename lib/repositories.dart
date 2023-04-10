@@ -8,12 +8,12 @@ abstract class Repository {
 }
 
 class HTTPRepository implements Repository {
-  final hostUrl = 'https://pokeapi.co/api/v2/';
+  final hostUrl = 'https://raw.githubusercontent.com';
 
   @override
   HomeRepository get getHomeRepository => HomeHTTPRepository();
 
   @override
   PokemonRepository get getPokemonRepository => PokemonHTTPRepository(
-      hostUrl: hostUrl, path: 'pokemon?limit=20&offset=0');
+      hostUrl: hostUrl, path: '/Biuni/PokemonGO-Pokedex/master/pokedex.json');
 }

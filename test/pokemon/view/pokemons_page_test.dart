@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:pokedex_app/pokemon/models/pokemon_preview.dart';
 import 'package:pokedex_app/pokemon/pokemon.dart';
 import 'package:pokedex_app/pokemon/pokemon_repository.dart';
 
@@ -26,7 +26,7 @@ void main() {
     );
     testWidgets('should be initializable', (tester) async {
       await tester.pumpWidget(page);
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.byType(PokemonsPageScaffold), findsOneWidget);
     });
     testWidgets('when repository throws error, should show error message',
@@ -42,7 +42,7 @@ void main() {
       when(() => mockRepo.getPokemons())
           .thenAnswer((_) async => Future.delayed(const Duration(seconds: 10)));
       await tester.pumpWidget(page);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(LottieBuilder), findsOneWidget);
     });
   });
 }
