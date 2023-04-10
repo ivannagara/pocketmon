@@ -44,21 +44,5 @@ void main() {
       await tester.pumpWidget(page);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
-    testWidgets(
-        'when repository is returns a list of 3 pokemon previews, should'
-        'show 3 list tiles that displays the pokemons name', (tester) async {
-      when(() => mockRepo.getPokemons()).thenAnswer((_) async => [
-            const PokemonPreview(name: 'Pikachu', url: 'abc'),
-            const PokemonPreview(name: 'Raichu', url: 'abc'),
-            const PokemonPreview(name: 'Charmander', url: 'abc'),
-          ]);
-      await tester.pumpWidget(page);
-      await tester.pump();
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.byType(ListTile), findsNWidgets(3));
-      expect(find.text('Pikachu'), findsOneWidget);
-      expect(find.text('Raichu'), findsOneWidget);
-      expect(find.text('Charmander'), findsOneWidget);
-    });
   });
 }

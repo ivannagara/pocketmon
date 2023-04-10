@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 abstract class PokemonRepository {
   Future<List<PokemonPreview>> getPokemons();
-  Future<List<dynamic>> getPokemonsFromGithubRepo();
+  Future<List<PokemonPreview>> getPokemonsFromGithubRepo();
 }
 
 class PokemonHTTPRepository implements PokemonRepository {
@@ -44,7 +44,28 @@ class PokemonHTTPRepository implements PokemonRepository {
   }
 
   @override
-  Future<List> getPokemonsFromGithubRepo() async {
-    return [];
+  Future<List<PokemonPreview>> getPokemonsFromGithubRepo() async {
+    const githubRepoHost = 'https://raw.githubusercontent.com';
+    const githubRepoPath = '/Biuni/PokemonGO-Pokedex/master/pokedex.json';
+
+    final res = await _client.get(Uri.parse(githubRepoHost + githubRepoPath));
+
+    if (res.statusCode != 200) {
+      throw Exception('${res.statusCode}: ${res.body}');
+    }
+
+    if (res.body.isEmpty) {
+      throw Exception('JSON body is empty');
+    }
+
+    final decodedJson = json.decode(res.body) as Map<String, dynamic>?;
+    final results = decodedJson?['pokemon'] as List<dynamic>?;
+
+    if (results == null) throw Exception('Pokemons body not found');
+
+    final pokemonPreviewList =
+        results.map((e) => PokemonPreview.fromJson(e ?? {})).toList();
+
+    return pokemonPreviewList;
   }
 }

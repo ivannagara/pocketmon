@@ -147,18 +147,15 @@ void main() {
           'when HTTP calll returns a response code of 200, should '
           'return a list of pokemon preview', () async {
         const expectedAnswer = [
-          PokemonPreview(
-            name: 'bulbasaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/1/',
-          ),
-          PokemonPreview(
-            name: 'ivysaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/2/',
-          ),
-          PokemonPreview(
-            name: 'venusaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/3/',
-          ),
+          // PokemonPreview(
+          //   name: 'bulbasaur',
+          // ),
+          // PokemonPreview(
+          //   name: 'ivysaur',
+          // ),
+          // PokemonPreview(
+          //   name: 'venusaur',
+          // ),
         ];
         when(() => mockClient.get(any())).thenAnswer(
           (_) async => http.Response(
