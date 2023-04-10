@@ -9,12 +9,32 @@ class MockClient extends Mock implements http.Client {}
 void main() {
   group('PokemonHTTPRepository', () {
     late MockClient mockClient;
+    const jsonFile = '''
+{
+  "count": 1279,
+  "next": "https://pokeapi.co/api/v2/pokemon?offset=3&limit=3",
+  "previous": null,
+  "results": [
+    {
+      "name": "bulbasaur",
+      "url": "https://pokeapi.co/api/v2/pokemon/1/"
+    },
+    {
+      "name": "ivysaur",
+      "url": "https://pokeapi.co/api/v2/pokemon/2/"
+    },
+    {
+      "name": "venusaur",
+      "url": "https://pokeapi.co/api/v2/pokemon/3/"
+    }
+  ]
+}''';
     setUp(() {
       registerFallbackValue(Uri());
       mockClient = MockClient();
       when(() => mockClient.get(any())).thenAnswer(
         (_) async => http.Response(
-          'success',
+          jsonFile,
           200,
         ),
       );
@@ -46,7 +66,7 @@ void main() {
           'in the client get method', () async {
         when(() => mockClient.get(any())).thenAnswer(
           (_) async => http.Response(
-            'success',
+            jsonFile,
             200,
           ),
         );
@@ -126,26 +146,6 @@ void main() {
       test(
           'when HTTP calll returns a response code of 200, should '
           'return a list of pokemon preview', () async {
-        const jsonFile = '''
-{
-  "count": 1279,
-  "next": "https://pokeapi.co/api/v2/pokemon?offset=3&limit=3",
-  "previous": null,
-  "results": [
-    {
-      "name": "bulbasaur",
-      "url": "https://pokeapi.co/api/v2/pokemon/1/"
-    },
-    {
-      "name": "ivysaur",
-      "url": "https://pokeapi.co/api/v2/pokemon/2/"
-    },
-    {
-      "name": "venusaur",
-      "url": "https://pokeapi.co/api/v2/pokemon/3/"
-    }
-  ]
-}''';
         const expectedAnswer = [
           PokemonPreview(
             name: 'bulbasaur',
