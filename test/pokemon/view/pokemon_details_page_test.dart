@@ -14,5 +14,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(PokemonDetailsPage), findsOneWidget);
     });
+    testWidgets('given a pokemon, should display the pokemons information',
+        (tester) async {
+      await tester.pumpWidget(page);
+      await tester.pumpAndSettle();
+      expect(find.byType(PokemonDetailsPage), findsOneWidget);
+    });
   });
 }

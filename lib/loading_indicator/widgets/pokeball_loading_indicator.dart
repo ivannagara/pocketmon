@@ -11,10 +11,9 @@ class PokeballLoadingIndicator extends StatelessWidget {
     return Center(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: SizedBox(
           height: 120,
           width: 120,
-          color: Colors.grey.shade100.withAlpha(150),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: LottieBuilder.asset('assets/pokeball-loading.json'),

@@ -348,7 +348,7 @@ class _DiscoverPokemonFlexibleAppBarState
       duration: const Duration(milliseconds: 1500),
     );
     _animationController.forward();
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 8), (timer) {
       if (_backgroundImageIndex == 4) {
         setState(() {
           _backgroundImageIndex = -1;
@@ -399,11 +399,12 @@ class _DiscoverPokemonFlexibleAppBarState
           ),
         ),
         child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 1000),
+          duration: const Duration(milliseconds: 750),
           switchInCurve: Curves.easeInOut,
           switchOutCurve: Curves.easeInOut,
           child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.45,
+            height: MediaQuery.of(context).size.height * 0.4,
+            width: MediaQuery.of(context).size.width,
             key: ValueKey<int>(_backgroundImageIndex),
             child: Image.asset(
               _backgroundImages[_backgroundImageIndex],
