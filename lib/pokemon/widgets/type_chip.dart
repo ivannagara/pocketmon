@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
 
-List<Widget> getTypeChip(List<String> types) {
+List<Widget> getTypeChip(List<String> types, {bool showTypeText = false}) {
   var chips = <Widget>[];
   if (types.isEmpty) return [];
   for (var i = 0; i < types.length && i < 2; i++) {
-    chips.add(Chip(
-      label: getPokemonTypeIcon(
-        types[i],
-        getPokemonTypeIconColor(types[i]),
-      ),
-      backgroundColor: getGridTileColor(types[i]),
+    chips.add(Column(
+      children: [
+        Tooltip(
+          message: types[i],
+          child: Chip(
+            label: getPokemonTypeIcon(
+              types[i],
+              getPokemonTypeIconColor(types[i]),
+            ),
+            backgroundColor: getGridTileColor(types[i]),
+          ),
+        ),
+        showTypeText
+            ? Text(
+                types[i],
+                style: TextStyle(
+                  color: getPokemonBackgroundColor(types[i]).withAlpha(180),
+                  fontWeight: FontWeight.w700,
+                ),
+              )
+            : Container(),
+      ],
     ));
   }
   return chips;

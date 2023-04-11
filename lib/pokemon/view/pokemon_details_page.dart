@@ -1,8 +1,8 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:pokedex_app/loading_indicator/loading_indicator.dart';
 import 'package:pokedex_app/pokemon/pokemon.dart';
 
 class PokemonDetailsPage extends StatelessWidget {
@@ -30,7 +30,7 @@ class PokemonDetailsPage extends StatelessWidget {
                   type: pokemon.type.isNotEmpty ? pokemon.type[0] : '',
                 ),
                 Positioned(
-                  top: height * 0.2,
+                  top: height * 0.15,
                   left: width * 0.3,
                   child: SizedBox(
                     height: width * 0.4,
@@ -47,7 +47,7 @@ class PokemonDetailsPage extends StatelessWidget {
                           color: Colors.white.withAlpha(80),
                           fontWeight: FontWeight.bold,
                         ),
-                    textScaleFactor: 1.6,
+                    textScaleFactor: 1.4,
                   ),
                 ),
                 Positioned(
@@ -59,7 +59,7 @@ class PokemonDetailsPage extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: height * 0.2,
+                  top: height * 0.125,
                   left: width * 0.25,
                   child: _PokemonImage(
                     width: width,
@@ -124,6 +124,9 @@ class _PokemonInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spawnChance = Random().nextDouble();
+    final attack = Random().nextDouble();
+    final hp = Random().nextDouble();
+    final def = Random().nextDouble();
     return Container(
       height: height * 0.6,
       width: width,
@@ -146,50 +149,174 @@ class _PokemonInfoSection extends StatelessWidget {
                 ),
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
+            padding: EdgeInsets.symmetric(vertical: 4),
             child: Divider(thickness: 0.5),
           ),
-          Text(
-            'Type',
-            style: Theme.of(context).textTheme.headline6!.copyWith(
-                  color: Colors.black.withAlpha(200),
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          Row(
-            children: [
-              ...getTypeChip(pokemon.type)
-                  .map(
-                    (chip) => Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: chip,
+          Expanded(
+            child: Scrollbar(
+              radius: const Radius.circular(6),
+              thickness: 6,
+              thumbVisibility: false,
+              interactive: true,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Type',
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Colors.black.withAlpha(220),
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
-                  )
-                  .toList(),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Text('Spawn Chance'),
-              const SizedBox(width: 4),
-              Text(
-                '${(spawnChance * 100).toStringAsFixed(1)}%',
+                    Row(
+                      children: [
+                        ...getTypeChip(pokemon.type, showTypeText: true)
+                            .map(
+                              (chip) => Padding(
+                                padding: const EdgeInsets.only(right: 18),
+                                child: chip,
+                              ),
+                            )
+                            .toList(),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Base Stats',
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Colors.black.withAlpha(220),
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: attack,
+                      statusName: 'Attack',
+                      baseStatsValue: 120,
+                    ),
+                    const SizedBox(height: 4),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: hp,
+                      statusName: 'HP',
+                      baseStatsValue: 150,
+                    ),
+                    const SizedBox(height: 4),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: def,
+                      statusName: 'Defense',
+                      baseStatsValue: 120,
+                    ),
+                    const SizedBox(height: 4),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: spawnChance,
+                      statusName: 'Spawn Chance',
+                      isPercentage: true,
+                    ),
+                    if (pokemon.nextEvolution.isNotEmpty)
+                      _NextEvolutionsSection(evolutions: pokemon.nextEvolution),
+                  ],
+                ),
               ),
-              const SizedBox(width: 4),
-              LinearPercentIndicator(
-                width: 100.0,
-                lineHeight: 8.0,
-                barRadius: const Radius.circular(6),
-                animation: true,
-                backgroundColor: Colors.grey.shade200,
-                progressColor: Colors.green,
-                percent: spawnChance,
-              ),
-            ],
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _NextEvolutionsSection extends StatelessWidget {
+  const _NextEvolutionsSection({
+    Key? key,
+    required this.evolutions,
+  }) : super(key: key);
+
+  final List<NextEvolution> evolutions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 18),
+        Text(
+          'Next Evolution',
+          style: Theme.of(context).textTheme.headline6!.copyWith(
+                color: Colors.black.withAlpha(220),
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(height: 8),
+        ..._getNextEvolution(evolutions),
+      ],
+    );
+  }
+}
+
+class _PokemonStatusNameAndLinearBarRow extends StatelessWidget {
+  const _PokemonStatusNameAndLinearBarRow({
+    Key? key,
+    required this.status,
+    this.baseStatsValue = 100,
+    required this.statusName,
+    this.isPercentage = false,
+  }) : super(key: key);
+
+  final double status;
+  final String statusName;
+  final num baseStatsValue;
+  final bool isPercentage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 120,
+          child: Text(
+            statusName,
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade800,
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        SizedBox(
+          width: 50,
+          child: Text(
+            isPercentage
+                ? '${(status * 100).toStringAsFixed(1)}%'
+                : (status * baseStatsValue).toStringAsFixed(1),
+          ),
+        ),
+        const SizedBox(width: 4),
+        _LinearStatusBar(percentage: status),
+      ],
+    );
+  }
+}
+
+class _LinearStatusBar extends StatelessWidget {
+  const _LinearStatusBar({
+    Key? key,
+    required this.percentage,
+  }) : super(key: key);
+
+  final double percentage;
+
+  @override
+  Widget build(BuildContext context) {
+    return LinearPercentIndicator(
+      width: 120,
+      lineHeight: 12,
+      barRadius: const Radius.circular(6),
+      animation: true,
+      backgroundColor: Colors.grey.shade300,
+      progressColor: _getStatusBarColor(percentage),
+      percent: percentage,
     );
   }
 }
@@ -210,35 +337,85 @@ class _PokemonImage extends StatelessWidget {
       child: SizedBox(
         height: width * 0.5,
         width: width * 0.5,
-        child: Image.network(
-          img,
-          scale: 0.5,
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            return child;
-          },
-          errorBuilder: (context, error, stackTrace) => Center(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Card(
-                color: Colors.grey.shade100.withAlpha(200),
-                child: const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text('Error Fetching Image'),
+        child: CachedNetworkImage(
+          imageUrl: img,
+          errorWidget: (context, url, error) {
+            return Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Card(
+                  color: Colors.grey.shade100.withAlpha(200),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text('Error Fetching Image'),
+                  ),
                 ),
               ),
-            ),
-          ),
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) {
-              return child;
-            } else {
-              return const Center(
-                child: PokeballLoadingIndicator(),
-              );
-            }
+            );
           },
         ),
       ),
     );
   }
+}
+
+Color _getStatusBarColor(double fraction) {
+  if (fraction < 0.1) {
+    return Colors.red.shade900;
+  }
+  if (fraction < 0.2) {
+    return Colors.red.shade500;
+  }
+  if (fraction < 0.3) {
+    return Colors.orange.shade800;
+  }
+  if (fraction < 0.4) {
+    return Colors.orange.shade400;
+  }
+  if (fraction < 0.5) {
+    return Colors.yellow.shade500;
+  }
+  if (fraction < 0.6) {
+    return Colors.lime.shade600;
+  }
+  if (fraction < 0.8) {
+    return Colors.green.shade600;
+  }
+  if (fraction <= 1) {
+    return Colors.green.shade800;
+  }
+  return Colors.blueGrey;
+}
+
+List<Widget> _getNextEvolution(List<NextEvolution> evolutions) {
+  var lists = <Widget>[];
+  if (evolutions.isEmpty) return [];
+  for (var i = 0; i < evolutions.length; i++) {
+    lists.add(Row(
+      children: [
+        Card(
+          color: Colors.grey.withAlpha(150),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Text(
+              '#${evolutions[i].num}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          evolutions[i].name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+          textScaleFactor: 1.1,
+        ),
+      ],
+    ));
+  }
+  return lists;
 }
