@@ -152,69 +152,71 @@ class _PokemonInfoSection extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 4),
             child: Divider(thickness: 0.5),
           ),
-          Scrollbar(
-            radius: const Radius.circular(6),
-            thickness: 6,
-            thumbVisibility: false,
-            interactive: true,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Type',
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                          color: Colors.black.withAlpha(220),
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  Row(
-                    children: [
-                      ...getTypeChip(pokemon.type, showTypeText: true)
-                          .map(
-                            (chip) => Padding(
-                              padding: const EdgeInsets.only(right: 18),
-                              child: chip,
-                            ),
-                          )
-                          .toList(),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'Base Stats',
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                          color: Colors.black.withAlpha(220),
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  _PokemonStatusNameAndLinearBarRow(
-                    status: attack,
-                    statusName: 'Attack',
-                    baseStatsValue: 120,
-                  ),
-                  const SizedBox(height: 4),
-                  _PokemonStatusNameAndLinearBarRow(
-                    status: hp,
-                    statusName: 'HP',
-                    baseStatsValue: 150,
-                  ),
-                  const SizedBox(height: 4),
-                  _PokemonStatusNameAndLinearBarRow(
-                    status: def,
-                    statusName: 'Defense',
-                    baseStatsValue: 120,
-                  ),
-                  const SizedBox(height: 4),
-                  _PokemonStatusNameAndLinearBarRow(
-                    status: spawnChance,
-                    statusName: 'Spawn Chance',
-                    isPercentage: true,
-                  ),
-                  if (pokemon.nextEvolution.isNotEmpty)
-                    _NextEvolutionsSection(evolutions: pokemon.nextEvolution),
-                ],
+          Expanded(
+            child: Scrollbar(
+              radius: const Radius.circular(6),
+              thickness: 6,
+              thumbVisibility: false,
+              interactive: true,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Type',
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Colors.black.withAlpha(220),
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    Row(
+                      children: [
+                        ...getTypeChip(pokemon.type, showTypeText: true)
+                            .map(
+                              (chip) => Padding(
+                                padding: const EdgeInsets.only(right: 18),
+                                child: chip,
+                              ),
+                            )
+                            .toList(),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Base Stats',
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Colors.black.withAlpha(220),
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: attack,
+                      statusName: 'Attack',
+                      baseStatsValue: 120,
+                    ),
+                    const SizedBox(height: 4),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: hp,
+                      statusName: 'HP',
+                      baseStatsValue: 150,
+                    ),
+                    const SizedBox(height: 4),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: def,
+                      statusName: 'Defense',
+                      baseStatsValue: 120,
+                    ),
+                    const SizedBox(height: 4),
+                    _PokemonStatusNameAndLinearBarRow(
+                      status: spawnChance,
+                      statusName: 'Spawn Chance',
+                      isPercentage: true,
+                    ),
+                    if (pokemon.nextEvolution.isNotEmpty)
+                      _NextEvolutionsSection(evolutions: pokemon.nextEvolution),
+                  ],
+                ),
               ),
             ),
           ),
