@@ -40,11 +40,12 @@ Color getGridTileColor(String type) {
   if (type == "Rock") return Colors.grey;
   if (type == "Ground") return Colors.brown;
   if (type == "Psychic") return Colors.indigo;
-  if (type == "Fighting") return Colors.orange;
+  if (type == "Fighting") return Colors.orange.shade700;
   if (type == "Bug") return Colors.lightGreenAccent;
   if (type == "Ghost") return Colors.deepPurple;
   if (type == "Normal") return Colors.black26;
   if (type == "Flying") return Colors.blue.shade500;
+  if (type == "Ice") return Colors.lightBlueAccent;
   return Colors.pink;
 }
 
@@ -62,6 +63,7 @@ Color getPokemonBackgroundColor(String type) {
   if (type == "Ghost") return Colors.deepPurple.shade700;
   if (type == "Normal") return Colors.black54;
   if (type == "Flying") return Colors.blue.shade700;
+  if (type == "Ice") return Colors.lightBlueAccent.shade700;
   return Colors.pink;
 }
 
@@ -73,12 +75,13 @@ Color getPokemonTypeIconColor(String type) {
   if (type == "Electric") return Colors.yellowAccent;
   if (type == "Rock") return Colors.grey.shade800;
   if (type == "Ground") return Colors.brown.shade200;
-  if (type == "Psychic") return Colors.indigo.shade800;
-  if (type == "Fighting") return Colors.orange.shade800;
+  if (type == "Psychic") return Colors.indigo.shade200;
+  if (type == "Fighting") return Colors.orange.shade200;
   if (type == "Bug") return Colors.lightGreen.shade800;
   if (type == "Ghost") return Colors.deepPurple.shade800;
   if (type == "Normal") return Colors.black87;
   if (type == "Flying") return Colors.blue.shade100;
+  if (type == "Ice") return Colors.white;
   return Colors.pink.shade200;
 }
 
@@ -96,5 +99,6 @@ Icon getPokemonTypeIcon(String type, Color color) {
   if (type == "Ghost") return Icon(Icons.people_outline, color: color);
   if (type == "Normal") return Icon(Icons.back_hand, color: color);
   if (type == "Flying") return Icon(Icons.flight, color: color);
+  if (type == "Ice") return Icon(Icons.severe_cold_rounded, color: color);
   return Icon(Icons.star, color: color);
 }

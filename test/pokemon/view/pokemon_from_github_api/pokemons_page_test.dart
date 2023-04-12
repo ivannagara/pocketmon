@@ -13,7 +13,7 @@ void main() {
     late MockPokemonRepository mockRepo;
     setUp(() {
       mockRepo = MockPokemonRepository();
-      when(() => mockRepo.getPokemons()).thenAnswer((_) async => []);
+      when(() => mockRepo.getPokemonsFromGithub()).thenAnswer((_) async => []);
     });
     tearDown(() {
       reset(mockRepo);
@@ -31,7 +31,7 @@ void main() {
     });
     testWidgets('when repository throws error, should show error message',
         (tester) async {
-      when(() => mockRepo.getPokemons())
+      when(() => mockRepo.getPokemonsFromGithub())
           .thenAnswer((_) async => Future.error(Exception('lol123')));
       await tester.pumpWidget(page);
       await tester.pumpAndSettle();
@@ -39,7 +39,7 @@ void main() {
     });
     testWidgets('when repository is loading, should show loading indicator',
         (tester) async {
-      when(() => mockRepo.getPokemons())
+      when(() => mockRepo.getPokemonsFromGithub())
           .thenAnswer((_) async => Future.delayed(const Duration(seconds: 10)));
       await tester.pumpWidget(page);
       expect(find.byType(LottieBuilder), findsOneWidget);

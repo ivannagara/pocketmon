@@ -58,14 +58,14 @@ void main() {
           PokemonHTTPRepository(client: mockClient, hostUrl: '', path: '');
       expect(repo, isA<PokemonHTTPRepository>());
     });
-    group('getPokemons', () {
+    group('getPokemonsFromGithub', () {
       test('should have a getPokemons that returns list of pokemon previews',
           () async {
         final res = await PokemonHTTPRepository(
           hostUrl: '',
           path: '',
           client: mockClient,
-        ).getPokemons();
+        ).getPokemonsFromGithub();
         expect(res, isA<List<PokemonPreview>>());
       });
       test(
@@ -81,7 +81,7 @@ void main() {
           client: mockClient,
           hostUrl: '/123/123/',
           path: 'aaa',
-        ).getPokemons();
+        ).getPokemonsFromGithub();
         verify(() => mockClient.get(Uri.parse('/123/123/aaa'))).called(1);
       });
       test(
@@ -97,7 +97,7 @@ void main() {
           client: mockClient,
           path: '',
           hostUrl: '',
-        ).getPokemons();
+        ).getPokemonsFromGithub();
         res.onError((error, stackTrace) async {
           expect(error, isA<Exception>());
           expect(error.toString(), contains('error 400 bad request'));
@@ -117,7 +117,7 @@ void main() {
           client: mockClient,
           path: '',
           hostUrl: '',
-        ).getPokemons();
+        ).getPokemonsFromGithub();
         res.onError((error, stackTrace) async {
           expect(error, isA<Exception>());
           expect(error.toString(), contains('JSON body is empty'));
@@ -141,7 +141,7 @@ void main() {
           client: mockClient,
           path: '',
           hostUrl: '',
-        ).getPokemons();
+        ).getPokemonsFromGithub();
         res.onError((error, stackTrace) async {
           expect(error, isA<Exception>());
           expect(error.toString(), contains('Pokemons body not found'));
@@ -183,8 +183,62 @@ void main() {
           client: mockClient,
           hostUrl: '',
           path: '',
-        ).getPokemons();
+        ).getPokemonsFromGithub();
         expect(res, expectedAnswer);
+      });
+    });
+    group('getPokemonsFromPokeApi', () {
+      const resBody = '''
+{
+    "count": 1279,
+    "next": "https://pokeapi.co/api/v2/pokemon?offset=3&limit=3",
+    "previous": null,
+    "results": [
+        {
+            "name": "bulbasaur",
+            "url": "https://pokeapi.co/api/v2/pokemon/1/"
+        },
+        {
+            "name": "ivysaur",
+            "url": "https://pokeapi.co/api/v2/pokemon/2/"
+        },
+        {
+            "name": "venusaur",
+            "url": "https://pokeapi.co/api/v2/pokemon/3/"
+        }
+    ]
+}''';
+      test('should return list of pokemons', () async {
+        when(
+          () => mockClient.get(
+            Uri.parse(
+              'https://pokeapi.co/api/v2/pokemon?limit=15&offset=0',
+            ),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(
+            resBody,
+            200,
+          ),
+        );
+        final res = await PokemonHTTPRepository(
+          hostUrl: '',
+          path: '',
+        ).getPokemonsFromPokeApi();
+        expect(res, [
+          const Pokemon(
+            name: 'bulbasaur',
+            pokemonDataUrl: 'https://pokeapi.co/api/v2/pokemon/1/',
+          ),
+          const Pokemon(
+            name: 'ivysaur',
+            pokemonDataUrl: 'https://pokeapi.co/api/v2/pokemon/2/',
+          ),
+          const Pokemon(
+            name: 'venusaur',
+            pokemonDataUrl: 'https://pokeapi.co/api/v2/pokemon/3/',
+          ),
+        ]);
       });
     });
   });

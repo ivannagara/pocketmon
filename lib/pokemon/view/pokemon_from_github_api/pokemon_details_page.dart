@@ -41,13 +41,34 @@ class PokemonDetailsPage extends StatelessWidget {
                 Positioned(
                   top: height * 0.07,
                   right: width * 0.05,
-                  child: Text(
-                    '#${pokemon.num}',
-                    style: Theme.of(context).textTheme.headline4!.copyWith(
-                          color: Colors.white.withAlpha(80),
-                          fontWeight: FontWeight.bold,
-                        ),
-                    textScaleFactor: 1.4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '#${pokemon.num}',
+                        style: Theme.of(context).textTheme.headline4!.copyWith(
+                              color: Colors.white.withAlpha(110),
+                              fontWeight: FontWeight.bold,
+                            ),
+                        textScaleFactor: 1.4,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        pokemon.height,
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              color: Colors.white.withAlpha(140),
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        pokemon.weight,
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              color: Colors.white.withAlpha(140),
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                    ],
                   ),
                 ),
                 Positioned(
@@ -213,6 +234,8 @@ class _PokemonInfoSection extends StatelessWidget {
                       statusName: 'Spawn Chance',
                       isPercentage: true,
                     ),
+                    const SizedBox(height: 18),
+                    _WeaknessesChip(weaknesses: pokemon.weaknesses),
                     if (pokemon.nextEvolution.isNotEmpty)
                       _NextEvolutionsSection(evolutions: pokemon.nextEvolution),
                   ],
@@ -222,6 +245,43 @@ class _PokemonInfoSection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _WeaknessesChip extends StatelessWidget {
+  const _WeaknessesChip({
+    Key? key,
+    required this.weaknesses,
+  }) : super(key: key);
+
+  final List<String> weaknesses;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Weaknesses',
+          style: Theme.of(context).textTheme.headline6!.copyWith(
+                color: Colors.black.withAlpha(220),
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        Row(
+          children: [
+            ...getTypeChip(weaknesses, showTypeText: true)
+                .map(
+                  (chip) => Padding(
+                    padding: const EdgeInsets.only(right: 18),
+                    child: chip,
+                  ),
+                )
+                .toList(),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -339,20 +399,32 @@ class _PokemonImage extends StatelessWidget {
         width: width * 0.5,
         child: CachedNetworkImage(
           imageUrl: img,
+          fit: BoxFit.cover,
           errorWidget: (context, url, error) {
-            return Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Card(
-                  color: Colors.grey.shade100.withAlpha(200),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Error Fetching Image'),
-                  ),
-                ),
-              ),
-            );
+            return const _ErrorFetchingImageWarningCard();
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorFetchingImageWarningCard extends StatelessWidget {
+  const _ErrorFetchingImageWarningCard({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Card(
+          color: Colors.grey.shade100.withAlpha(200),
+          child: const Padding(
+            padding: EdgeInsets.all(8),
+            child: Text('Error Fetching Image'),
+          ),
         ),
       ),
     );

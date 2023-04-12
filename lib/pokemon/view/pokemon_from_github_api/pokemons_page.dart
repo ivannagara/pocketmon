@@ -16,7 +16,7 @@ class PokemonsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider<PokemonRepository>(
       create: (context) => HTTPRepository().getPokemonRepository,
-      child: const PokemonsPageScaffold(childCount: 30),
+      child: const PokemonsPageScaffold(childCount: 40),
     );
   }
 }
@@ -34,31 +34,46 @@ class PokemonsPageScaffold extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.blueGrey.shade300,
       body: FutureBuilder<List<PokemonPreview>>(
-        future: context.read<PokemonRepository>().getPokemons(),
+        future: context.read<PokemonRepository>().getPokemonsFromGithub(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text(snapshot.error.toString()),
+              child: Column(
+                children: [
+                  Text(snapshot.error.toString()),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Back'),
+                  ),
+                ],
+              ),
             );
           }
           if (snapshot.hasData) {
             return NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) =>
                   [const _FlexibleAppBar()],
-              body: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Stack(
-                      children: [
-                        const _PokeballBackgroundImage(),
-                        _PokemonGridViewLists(
-                          childCount: childCount,
-                          pokemons: snapshot.data ?? [],
-                        ),
-                      ],
-                    ),
-                  ],
+              body: Scrollbar(
+                thickness: 8,
+                radius: const Radius.circular(8),
+                interactive: true,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Stack(
+                        children: [
+                          const _PokeballBackgroundImage(),
+                          _PokemonGridViewLists(
+                            childCount: childCount,
+                            pokemons: snapshot.data ?? [],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -139,15 +154,22 @@ class _AppBarBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          height: 25,
-          width: 25,
-          color: Colors.grey.withAlpha(180),
-          child: const BackButton(),
+    return Tooltip(
+      message: 'Back',
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            height: 25,
+            width: 25,
+            color: Colors.grey.withAlpha(180),
+            child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back_ios_new_rounded)),
+          ),
         ),
       ),
     );
@@ -197,6 +219,18 @@ class _PokemonsGridTile extends StatelessWidget {
                     right: 0,
                     child: _TypeColoredCircleBackground(
                       type: pokemon.type[0],
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 6,
+                    child: Text(
+                      '#${pokemon.num}',
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                            color: Colors.white.withAlpha(95),
+                            fontWeight: FontWeight.bold,
+                          ),
+                      textScaleFactor: 0.75,
                     ),
                   ),
                   Positioned(

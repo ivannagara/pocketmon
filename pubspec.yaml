@@ -44,6 +44,8 @@ dependencies:
   lottie: ^2.3.2
   percent_indicator: ^4.2.3
   cached_network_image: ^3.2.3
+  bloc_concurrency: ^0.2.1
+  stream_transform: ^2.1.0
 
 dev_dependencies:
   flutter_test:
